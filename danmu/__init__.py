@@ -23,14 +23,7 @@ class DanMuClient(object):
             self.__url = url
         else:
             self.__url = 'http://' + url
-        for u, bc in {'panda.tv'    : PandaDanMuClient,
-                'douyu.com'         : DouYuDanMuClient,
-                'quanmin.tv'        : QuanMinDanMuClient,
-                'zhanqi.tv'         : ZhanQiDanMuClient,
-                'live.bilibili.com' : BilibiliDanMuClient,
-                'huomao.com'        : HuoMaoDanMuClient, }.items() :
-            if re.match(r'^(?:http://)?.*?%s/(.+?)$' % u, url):
-                self.__baseClient = bc; break
+        self.__baseClient = DouYuDanMuClient
     def __register(self, fn, msgType):
         if fn is None:
             if msgType == 'default':
@@ -43,6 +36,12 @@ class DanMuClient(object):
         return self.__baseClient is not None
     def default(self, fn):
         self.__register(fn, 'default')
+        return fn
+    def onLive(self,fn):
+        self.__register(fn,'onLive')
+        return fn
+    def onClose(self,fn):
+        self.__register(fn,'onClose')
         return fn
     def danmu(self, fn):
         self.__register(fn, 'danmu')

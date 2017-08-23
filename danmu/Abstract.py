@@ -18,6 +18,7 @@ class AbstractDanMuClient(object):
         self.anchorStatusRescanTime = anchorStatusRescanTime
         self.deprecated = False # this is an outer live flag
         self.live = False # this is an inner live flag
+        self.liveFlag=False
         self.danmuSocket = None
         self.danmuThread, self.heartThread = None, None
         self.msgPipe = []
@@ -26,7 +27,12 @@ class AbstractDanMuClient(object):
         while not self.deprecated:
             try:
                 while not self.deprecated:
-                    if self._get_live_status(): break
+                    bool last=self.liveFlag
+                    self.liveFlag=self._get_live_status()
+                    if(last!=self.liveFlag):
+                        self.msgPipe.append(self.liveFlag)
+                    if self.liveFlag: 
+                        break
                     time.sleep(self.anchorStatusRescanTime)
                 else:
                     break

@@ -1,13 +1,15 @@
 import time, sys
 
 from danmu import DanMuClient
+from danmu import DouYuDanMuClient
 
 def pp(msg):
     print(msg.encode(sys.stdin.encoding, 'ignore').
         decode(sys.stdin.encoding))
-
-dmc = DanMuClient('https://www.douyu.com/32892')
+##1969843
+dmc = DanMuClient('https://www.douyu.com/3484')
 if not dmc.isValid(): print('Url not valid')
+
 
 @dmc.danmu
 def danmu_fn(msg):
