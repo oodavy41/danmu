@@ -1,11 +1,6 @@
 import re, threading, time, traceback
 
 from .DouYu    import DouYuDanMuClient
-from .Panda    import PandaDanMuClient
-from .ZhanQi   import ZhanQiDanMuClient
-from .QuanMin  import QuanMinDanMuClient
-from .Bilibili import BilibiliDanMuClient
-from .HuoMao   import HuoMaoDanMuClient
 from .log      import set_logging
 from .config   import VERSION
 
