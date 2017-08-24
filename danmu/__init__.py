@@ -37,11 +37,8 @@ class DanMuClient(object):
     def default(self, fn):
         self.__register(fn, 'default')
         return fn
-    def onLive(self,fn):
-        self.__register(fn,'onLive')
-        return fn
-    def onClose(self,fn):
-        self.__register(fn,'onClose')
+    def onState(self,fn):
+        self.__register(fn,'onState')
         return fn
     def danmu(self, fn):
         self.__register(fn, 'danmu')

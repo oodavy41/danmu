@@ -27,10 +27,11 @@ class AbstractDanMuClient(object):
         while not self.deprecated:
             try:
                 while not self.deprecated:
-                    bool last=self.liveFlag
+                    last=self.liveFlag
                     self.liveFlag=self._get_live_status()
                     if(last!=self.liveFlag):
-                        self.msgPipe.append(self.liveFlag)
+                        msg={'MsgType':'onState','value':self.liveFlag}
+                        self.msgPipe.append(msg)
                     if self.liveFlag: 
                         break
                     time.sleep(self.anchorStatusRescanTime)
