@@ -24,7 +24,7 @@ XMLhead='''
 '''
 
 JSONFILE={'name':'','time':0.0,'file':None};
-##danmu{time:unixtime,message:text}
+#danmu{time:unixtime,message:text}
 
 @dmc.onState
 def state_change(msg):

@@ -44,7 +44,7 @@ class DanMuClient(object):
     def other(self, fn):
         self.__register(fn, 'other')
         return fn
-    def start(self, blockThread = False, pauseTime = .1):
+    def start(self, blockThread = False, pauseTime = .3):
         if not self.__baseClient or self.__isRunning: return False
         self.__client = self.__baseClient(self.__url)
         self.__isRunning = True
