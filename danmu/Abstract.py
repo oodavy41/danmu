@@ -32,16 +32,15 @@ class AbstractDanMuClient(object):
                     if(last!=self.liveFlag):
                         msg={'MsgType':'onState','value':self.liveFlag}
                         self.msgPipe.append(msg)
-                    if self.liveFlag: 
-                        break
+                        if self.liveFlag: 
+                            danmuSocketInfo, roomInfo = self._prepare_env()
+                            if self.danmuSocket: self.danmuSocket.close()
+                            self.danmuWaitTime = -1
+                            self._init_socket(danmuSocketInfo, roomInfo)
+                            danmuThreadFn, heartThreadFn = self._create_thread_fn(roomInfo)
+                            self._wrap_thread(danmuThreadFn, heartThreadFn)
+                            self._start_receive()
                     time.sleep(self.anchorStatusRescanTime)
-                danmuSocketInfo, roomInfo = self._prepare_env()
-                if self.danmuSocket: self.danmuSocket.close()
-                self.danmuWaitTime = -1
-                self._init_socket(danmuSocketInfo, roomInfo)
-                danmuThreadFn, heartThreadFn = self._create_thread_fn(roomInfo)
-                self._wrap_thread(danmuThreadFn, heartThreadFn)
-                self._start_receive()
             except Exception as e:
                 logger.debug(traceback.format_exc())
                 time.sleep(5)
@@ -79,8 +78,10 @@ class AbstractDanMuClient(object):
         self.danmuThread.setDaemon(True)
     def _start_receive(self):
         self.live = True
-        self.danmuThread.start()
-        self.heartThread.start()
+        if not self.danmuThread.is_alive()
+            self.danmuThread.start()
+        if not self.heartThread.is_alive()
+            self.heartThread.start()
         self.danmuWaitTime = time.time() + 20
     def thread_alive(self):
         if self.danmuSocket is None or not self.danmuThread.isAlive():
