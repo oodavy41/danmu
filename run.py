@@ -1,12 +1,15 @@
-import time, sys ,datetime
+#!/usr/bin/python3
+# -*- coding:utf8 -*-
+
+import time, sys ,datetime, os
 
 from danmu import DanMuClient
 
 def pp(msg):
-    return (msg.encode(sys.stdin.encoding, 'ignore').decode(sys.stdin.encoding))
+    return msg#(msg.decode('utf8').encode('gbk'))
 
 ##1969843
-dmc = DanMuClient('https://www.douyu.com/1969843')
+dmc = DanMuClient('https://www.douyu.com/126493')
 if not dmc.isValid(): print('Url not valid')
 
 
@@ -30,11 +33,15 @@ def state_change(msg):
     if(msg['value']):
         JSONFILE['name']=datetime.datetime.now().strftime('%Y-%m-%d')
         JSONFILE['time']=time.time()
-        JSONFILE['file'] = open('mvs/%s.xml' % JSONFILE['name'],'w',encoding='utf-8')
+        if not os.path.exists('mvs/'+JSONFILE['name']):
+            os.makedirs('mvs/'+JSONFILE['name'])
+        JSONFILE['file'] = open('mvs/%s/%s.xml' % (JSONFILE['name'],JSONFILE['name']),'w',-1,"utf8")
         JSONFILE['file'].write(XMLhead)
     else:
         JSONFILE['file'].write('</i>\n')
         JSONFILE['file'].close()
+        pathF='mvs/%s/%s' % (JSONFILE['name'],JSONFILE['name'])
+        os.system('py niconvert.pyw '+pathF+'.xml +r 1280x720 -o '+pathF)
         JSONFILE={'name':'','time':0.0,'file':None}
 
 
