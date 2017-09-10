@@ -9,7 +9,7 @@ def pp(msg):
     return msg#(msg.decode('utf8').encode('gbk'))
 
 ##1969843
-dmc = DanMuClient('https://www.douyu.com/126493')
+dmc = DanMuClient('https://www.douyu.com/3484')
 if not dmc.isValid(): print('Url not valid')
 
 
@@ -39,6 +39,7 @@ def state_change(msg):
         JSONFILE['file'].write(XMLhead)
     else:
         JSONFILE['file'].write('</i>\n')
+        JSONFILE['file'].write(JSONFILE['time']+'\n')
         JSONFILE['file'].close()
         pathF='mvs/%s/%s' % (JSONFILE['name'],JSONFILE['name'])
         os.system('py niconvert.pyw '+pathF+'.xml +r 1280x720 -o '+pathF)
