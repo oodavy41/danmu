@@ -78,9 +78,9 @@ class AbstractDanMuClient(object):
         self.danmuThread.setDaemon(True)
     def _start_receive(self):
         self.live = True
-        if not self.danmuThread.is_alive()
+        if not self.danmuThread.is_alive():
             self.danmuThread.start()
-        if not self.heartThread.is_alive()
+        if not self.heartThread.is_alive():
             self.heartThread.start()
         self.danmuWaitTime = time.time() + 20
     def thread_alive(self):
