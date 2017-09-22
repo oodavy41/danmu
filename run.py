@@ -29,18 +29,16 @@ JSONFILE = {'name': '', 'time': 0.0, 'file': None}
 #danmu{time:unixtime,message:text}
 
 
-def onOpenFun():
+def onOpenFun(JSONFILE):
     JSONFILE['name'] = datetime.datetime.now().strftime('%Y-%m-%d')
     JSONFILE['time'] = time.time()
     if not os.path.exists('mvs/' + JSONFILE['name']):
         os.makedirs('mvs/' + JSONFILE['name'])
-    JSONFILE['file'] = open('mvs/%s/%s.xml' % (JSONFILE['name'],
-                                               JSONFILE['name']), 'w', -1,
-                            "utf8")
+    JSONFILE['file'] = open('mvs/%s/%s.xml' % (JSONFILE['name'],JSONFILE['name']), 'w', -1,"utf8")
     JSONFILE['file'].write(XMLhead % JSONFILE['time'])
 
 
-def onCloseFun():
+def onCloseFun(JSONFILE):
     JSONFILE['file'].write('</i>\n')
     JSONFILE['file'].close()
     pathF = 'mvs/%s/%s' % (JSONFILE['name'], JSONFILE['name'])
@@ -54,10 +52,10 @@ def state_change(msg):
     global JSONFILE
     if (msg['value']):
         if (JSONFILE['file'] != None):
-            onCloseFun()
-        onOpenFun()
+            onCloseFun(JSONFILE)
+        onOpenFun(JSONFILE)
     else:
-        onCloseFun()
+        onCloseFun(JSONFILE)
 
 
 @dmc.danmu
