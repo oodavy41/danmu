@@ -44,7 +44,7 @@ def onCloseFun():
     JSONFILE['file'].write('</i>\n')
     JSONFILE['file'].close()
     pathF = 'mvs/%s/%s' % (JSONFILE['name'], JSONFILE['name'])
-    os.system('py niconvert.pyw ' + pathF + '.xml +r 1280x720 -o ' + pathF)
+    os.system('python3 niconvert.pyw ' + pathF + '.xml +r 1280x720 -o ' + pathF)
     JSONFILE = {'name': '', 'time': 0.0, 'file': None}
 
 
