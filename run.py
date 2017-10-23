@@ -48,7 +48,7 @@ def onCloseFun():
     pathF = 'mvs/%s/%s' % (JSONFILE['name'], JSONFILE['name'])
     path = 'mvs/%s' % JSONFILE['name']
     subprocess.call([
-        "python3", "niconvert.pyw", pathF + '.xml', 'r 1280x720', '-o' + path
+        "python3", "niconvert.pyw", pathF + '.xml', '-o' + path
     ], True)
     JSONFILE = {'name': '', 'time': 0.0, 'file': None}
 
