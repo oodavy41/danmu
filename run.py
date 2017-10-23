@@ -47,8 +47,9 @@ def onCloseFun():
     JSONFILE['file'].close()
     pathF = 'mvs/%s/%s' % (JSONFILE['name'], JSONFILE['name'])
     path = 'mvs/%s' % JSONFILE['name']
+    #subprocess.call(["python3","niconvert.pyw","mvs/2017-10-21/2017-10-21.xml","-o","mvs/2017-10-21/"],True)
     subprocess.call([
-        "python3", "niconvert.pyw", pathF + '.xml', '-o' + path
+        "python3", "niconvert.pyw", pathF + ".xml", "-o" , path
     ], True)
     JSONFILE = {'name': '', 'time': 0.0, 'file': None}
 
@@ -69,7 +70,7 @@ def state_change(msg):
 def danmu_fn(msg):
     print(pp('%s:[%s] %s' % (time.time(), msg['NickName'], msg['Content'])))
     if (JSONFILE['file'] != None):
-        JSONFILE['file'].write('<d p="%s,1,25,16777215,0,0,0,0">%s</d>\n' %
+        JSONFILE['file'].write(u'<d p="%s,1,25,16777215,0,0,0,0">%s</d>\n' %
                                (time.time() - JSONFILE['time'],
                                 pp(msg['Content'])))
 
