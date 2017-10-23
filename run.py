@@ -35,7 +35,9 @@ def onOpenFun():
     JSONFILE['time'] = time.time()
     if not os.path.exists('mvs/' + JSONFILE['name']):
         os.makedirs('mvs/' + JSONFILE['name'])
-    JSONFILE['file'] = open('mvs/%s/%s.xml' % (JSONFILE['name'],JSONFILE['name']), 'w', -1,"utf8")
+    JSONFILE['file'] = open('mvs/%s/%s.xml' % (JSONFILE['name'],
+                                               JSONFILE['name']), 'w', -1,
+                            "utf8")
     JSONFILE['file'].write(XMLhead % JSONFILE['time'])
 
 
@@ -44,7 +46,10 @@ def onCloseFun():
     JSONFILE['file'].write('</i>\n')
     JSONFILE['file'].close()
     pathF = 'mvs/%s/%s' % (JSONFILE['name'], JSONFILE['name'])
-    subprocess.call('python3 niconvert.pyw ' + pathF + '.xml +r 1280x720 -o ' + pathF,True)
+    path = 'mvs/%s' % JSONFILE['name']
+    subprocess.call([
+        "python3", "niconvert.pyw", pathF + '.xml', 'r 1280x720', '-o' + path
+    ], True)
     JSONFILE = {'name': '', 'time': 0.0, 'file': None}
 
 
