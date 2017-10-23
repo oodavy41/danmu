@@ -14,7 +14,7 @@ def pp(msg):
 dmc = DanMuClient('https://www.douyu.com/3484')
 if not dmc.isValid(): print('Url not valid')
 
-XMLhead = '''
+XMLhead = u'''
 <i>%s
 <chatserver>chat.bilibili.com</chatserver>
 <chatid>0</chatid>
