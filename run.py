@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding:utf8 -*-
 
-import time, sys, datetime, os
+import time, sys, datetime, os, subprocess
 
 from danmu import DanMuClient
 
@@ -44,7 +44,7 @@ def onCloseFun():
     JSONFILE['file'].write('</i>\n')
     JSONFILE['file'].close()
     pathF = 'mvs/%s/%s' % (JSONFILE['name'], JSONFILE['name'])
-    os.system('python3 niconvert.pyw ' + pathF + '.xml +r 1280x720 -o ' + pathF)
+    subprocess.call('python3 niconvert.pyw ' + pathF + '.xml +r 1280x720 -o ' + pathF,True)
     JSONFILE = {'name': '', 'time': 0.0, 'file': None}
 
 
