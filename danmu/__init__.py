@@ -1,6 +1,8 @@
 import re, threading, time, traceback
 
 from .DouYu    import DouYuDanMuClient
+from .Panda    import PandaDanMuClient
+from .Bilibili import BilibiliDanMuClient
 from .log      import set_logging
 from .config   import VERSION
 
@@ -18,7 +20,12 @@ class DanMuClient(object):
             self.__url = url
         else:
             self.__url = 'http://' + url
-        self.__baseClient = DouYuDanMuClient
+        for u, bc in {
+                'panda.tv'    : PandaDanMuClient,
+                'douyu.com'         : DouYuDanMuClient,
+                'live.bilibili.com' : BilibiliDanMuClient,}.items() :
+            if re.match(r'^(?:http://)?.*?%s/(.+?)$' % u, url):
+                self.__baseClient = bc; break
     def __register(self, fn, msgType):
         if fn is None:
             if msgType == 'default':
