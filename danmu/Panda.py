@@ -29,19 +29,18 @@ class PandaDanMuClient(AbstractDanMuClient):
         return j['videoinfo']['status'] == '2'
     def _prepare_env(self):
         roomId = self.url.split('/')[-1] or self.url.split('/')[-2]
-        url = 'http://www.panda.tv/ajax_chatroom?roomid=%s&_=%s'%(roomId, str(int(time.time())))
+        url = 'http://riven.panda.tv/chatroom/getinfo?roomid=%s'%roomId
         roomInfo = requests.get(url).json()
-        url = 'http://api.homer.panda.tv/chatroom/getinfo'
+        #{"errno":0,"errmsg":"","data":{"appid":"134228028","rid":-15063180,"sign":"f076f0421a18a899fe8ac69630d591fb","authType":"4","ts":1508922975000,"chat_addr_list":["118.89.11.25:443","118.89.11.25:8080"]}}
         params = {
             'rid': roomInfo['data']['rid'],
-            'roomid': roomId,
-            'retry': 0,
+            'appid': roomInfo['data']['appid'],
+            'authType': roomInfo['data']['authType'],
             'sign': roomInfo['data']['sign'], 
             'ts': roomInfo['data']['ts'],
-            '_': int(time.time()), }
-        serverInfo = requests.get(url, params).json()['data']
-        serverAddress = serverInfo['chat_addr_list'][0].split(':')
-        return (serverAddress[0], int(serverAddress[1])), serverInfo
+        }
+        serverAddress = roomInfo['data']['chat_addr_list'][0].split(':')
+        return (serverAddress[0], int(serverAddress[1])), params
     def _init_socket(self, danmu, roomInfo):
         data = [
             ('u', '%s@%s'%(roomInfo['rid'], roomInfo['appid'])),
@@ -51,8 +50,7 @@ class PandaDanMuClient(AbstractDanMuClient):
             ('sign', roomInfo['sign']),
             ('authtype', roomInfo['authType']) ]
         data = '\n'.join('%s:%s'%(k, v) for k, v in data)
-        data = (b'\x00\x06\x00\x02\x00' + pack('B', len(data)) +
-            data.encode('utf8') + b'\x00\x06\x00\x00')
+        data = b'\x00\x06\x00\x02' + pack('B', len(data)) + data.encode('utf8')
         self.danmuSocket = _socket(socket.AF_INET, socket.SOCK_STREAM)
         self.danmuSocket.settimeout(3)
         self.danmuSocket.connect(danmu)
@@ -75,6 +73,6 @@ class PandaDanMuClient(AbstractDanMuClient):
                     self.danmuWaitTime = time.time() + self.maxNoDanMuWait
                     self.msgPipe.append(msg)
         def heart_beat(self):
-            self.danmuSocket.push(b'\x00\x06\x00\x06')
+            self.danmuSocket.push(b'\x00\x06\x00\x00')
             time.sleep(60)
         return get_danmu, heart_beat

@@ -11,7 +11,7 @@ def pp(msg):
 
 
 ##1969843
-dmc = DanMuClient('https://www.douyu.com/3484')
+dmc = DanMuClient('https://www.panda.tv/10300')
 if not dmc.isValid(): print('Url not valid')
 
 XMLhead = u'''
