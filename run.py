@@ -11,7 +11,8 @@ def pp(msg):
 
 
 ##1969843
-dmc = DanMuClient('https://www.panda.tv/24163')
+url = 'https://www.panda.tv/24163'
+dmc = DanMuClient(url)
 if not dmc.isValid(): print('Url not valid')
 
 XMLhead = u'''
@@ -24,13 +25,15 @@ XMLhead = u'''
 
 '''
 
-JSONFILE = {'name': '', 'time': 0.0, 'file': None}
+JSONFILE = {'name': '', 'time': 0.0, 'file': None, 'stream': None}
 
 #danmu{time:unixtime,message:text}
 #ffmpeg -i Lantern.mp4 -vcodec libx264 -preset fast -crf 20 -vf "ass=Lantern.ass" out.mp4
 
+
 def onOpenFun():
     global JSONFILE
+    global url
     JSONFILE['name'] = datetime.datetime.now().strftime('%Y-%m-%d')
     JSONFILE['time'] = time.time()
     if not os.path.exists('mvs/' + JSONFILE['name']):
@@ -40,6 +43,11 @@ def onOpenFun():
                             "utf8")
     JSONFILE['file'].write(XMLhead % JSONFILE['time'])
 
+    JSONFILE['stream'] = subprocess.Popen([
+        'you-get', '-o',
+        'mvs/%s' % JSONFILE['name'], '-O', JSONFILE['name'], url
+    ])
+
 
 def onCloseFun():
     global JSONFILE
@@ -48,9 +56,20 @@ def onCloseFun():
     pathF = 'mvs/%s/%s' % (JSONFILE['name'], JSONFILE['name'])
     path = 'mvs/%s' % JSONFILE['name']
     subprocess.call([
-        "python3", "niconvert.pyw", pathF + ".xml","+r","1600x900", "-o" , path
+        "python3", 
+        "niconvert.pyw", pathF + ".xml", 
+        "+r", "1600x900", 
+        "-o", path
     ], True)
-    JSONFILE = {'name': '', 'time': 0.0, 'file': None}
+    JSONFILE['stream'].terminate()
+    subprocess.call([
+        'ffmpeg', '-i', 
+        'mvs/%s/%s.flv' % (JSONFILE['name'], JSONFILE['name']), 
+        '-vcodec', 'libx264', 
+        '-crf', '23.5', 
+        '-vf', 'ass=mvs/%s/%s.ass' % (JSONFILE['name'], JSONFILE['name'])
+    ], True)
+    JSONFILE = {'name': '', 'time': 0.0, 'file': None, 'stream': None}
 
 
 @dmc.onState
