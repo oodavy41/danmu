@@ -14,15 +14,15 @@ class _socket(socket.socket):
         self.sendall(data)
     def pull(self):
         try: # for socket.settimeout
-            return self.recv(9999)
+            rec=self.recv(9999)
+            return rec
         except:
             return ''
 
 class PandaDanMuClient(AbstractDanMuClient):
     def _get_live_status(self):
         params = {
-            'roomid': (self.url.split('/')[-1] or
-                self.url.split('/')[-2]),
+            'roomid': (self.url.split('/')[-1] or self.url.split('/')[-2]),
             'pub_key': '',
             '_': int(time.time()), }
         j = requests.get('http://www.panda.tv/api_room', params).json()['data']
@@ -50,7 +50,7 @@ class PandaDanMuClient(AbstractDanMuClient):
             ('sign', roomInfo['sign']),
             ('authtype', roomInfo['authType']) ]
         data = '\n'.join('%s:%s'%(k, v) for k, v in data)
-        data = b'\x00\x06\x00\x02' + pack('B', len(data)) + data.encode('utf8')
+        data = b'\x00\x06\x00\x02' + int.to_bytes(len(data), 2, 'big') + data.encode('utf8')
         self.danmuSocket = _socket(socket.AF_INET, socket.SOCK_STREAM)
         self.danmuSocket.settimeout(3)
         self.danmuSocket.connect(danmu)

@@ -11,7 +11,7 @@ def pp(msg):
 
 
 ##1969843
-dmc = DanMuClient('https://www.panda.tv/10300')
+dmc = DanMuClient('https://www.panda.tv/24163')
 if not dmc.isValid(): print('Url not valid')
 
 XMLhead = u'''
@@ -27,7 +27,7 @@ XMLhead = u'''
 JSONFILE = {'name': '', 'time': 0.0, 'file': None}
 
 #danmu{time:unixtime,message:text}
-
+#ffmpeg -i Lantern.mp4 -vcodec libx264 -preset fast -crf 20 -vf "ass=Lantern.ass" out.mp4
 
 def onOpenFun():
     global JSONFILE
@@ -47,9 +47,8 @@ def onCloseFun():
     JSONFILE['file'].close()
     pathF = 'mvs/%s/%s' % (JSONFILE['name'], JSONFILE['name'])
     path = 'mvs/%s' % JSONFILE['name']
-    #subprocess.call(["python3","niconvert.pyw","mvs/2017-10-21/2017-10-21.xml","-o","mvs/2017-10-21/"],True)
     subprocess.call([
-        "python3", "niconvert.pyw", pathF + ".xml", "-o" , path
+        "python3", "niconvert.pyw", pathF + ".xml","+r","1600x900", "-o" , path
     ], True)
     JSONFILE = {'name': '', 'time': 0.0, 'file': None}
 
