@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding:utf8 -*-
 
-import time, sys, datetime, os, subprocess
+import time, sys, datetime, os, subprocess, signal
 
 from danmu import DanMuClient
 
@@ -11,7 +11,7 @@ def pp(msg):
 
 
 ##1969843
-url = 'https://www.panda.tv/24163'
+url = 'https://www.panda.tv/1512212'
 dmc = DanMuClient(url)
 if not dmc.isValid(): print('Url not valid')
 
@@ -29,6 +29,7 @@ JSONFILE = {'name': '', 'time': 0.0, 'file': None, 'stream': None}
 
 #danmu{time:unixtime,message:text}
 #ffmpeg -i Lantern.mp4 -vcodec libx264 -preset fast -crf 20 -vf "ass=Lantern.ass" out.mp4
+#ffmpeg -i 2017-10-26.flv -vcodec libx264 -crf 23.5 -strict -2 2017-10-26.mp4
 
 
 def onOpenFun():
@@ -53,22 +54,18 @@ def onCloseFun():
     global JSONFILE
     JSONFILE['file'].write('</i>\n')
     JSONFILE['file'].close()
-    pathF = 'mvs/%s/%s' % (JSONFILE['name'], JSONFILE['name'])
-    path = 'mvs/%s' % JSONFILE['name']
-    subprocess.call([
-        "python3", 
-        "niconvert.pyw", pathF + ".xml", 
-        "+r", "1600x900", 
-        "-o", path
-    ], True)
+    pathF = 'mvs/%s/%s.xml' % (JSONFILE['name'], JSONFILE['name'])
+    path = 'mvs/%s/' % JSONFILE['name']
+    subprocess.call(
+        ["python", "niconvert.pyw", pathF, "+r", "1600x900", "-o", path])
     JSONFILE['stream'].terminate()
     subprocess.call([
-        'ffmpeg', '-i', 
-        'mvs/%s/%s.flv' % (JSONFILE['name'], JSONFILE['name']), 
-        '-vcodec', 'libx264', 
-        '-crf', '23.5', 
-        '-vf', 'ass=mvs/%s/%s.ass' % (JSONFILE['name'], JSONFILE['name'])
-    ], True)
+        'ffmpeg', '-threads', 'auto', '-i',
+        'mvs/%s/%s.flv' % (JSONFILE['name'], JSONFILE['name']), '-vcodec',
+        'libx264', '-strict', '-2', '-crf', '23.5', '-vf',
+        'ass=mvs/%s/%s.ass' % (JSONFILE['name'], JSONFILE['name']),
+        'mvs/%s/%s.mp4' % (JSONFILE['name'], JSONFILE['name'])
+    ])
     JSONFILE = {'name': '', 'time': 0.0, 'file': None, 'stream': None}
 
 
@@ -86,11 +83,13 @@ def state_change(msg):
 
 @dmc.danmu
 def danmu_fn(msg):
+    global JSONFILE
     print(pp('%s:[%s] %s' % (time.time(), msg['NickName'], msg['Content'])))
-    if (JSONFILE['file'] != None):
+    if (JSONFILE['file'] != None and not JSONFILE['file'].closed):
         JSONFILE['file'].write(u'<d p="%s,1,25,16777215,0,0,0,0">%s</d>\n' %
                                (time.time() - JSONFILE['time'],
                                 pp(msg['Content'])))
+        JSONFILE['file'].flush()
 
 
 @dmc.gift
@@ -103,4 +102,13 @@ def other_fn(msg):
     print(pp('Other message received'))
 
 
+def lda(*args):
+    global JSONFILE
+    if (JSONFILE['file'] != None and not JSONFILE['file'].closed):
+        onCloseFun()
+    exit()
+
+
+signal.signal(signal.SIGTERM, lda)
+signal.signal(signal.SIGINT, lda)
 dmc.start(blockThread=True)
