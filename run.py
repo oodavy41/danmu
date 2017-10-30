@@ -11,7 +11,7 @@ def pp(msg):
 
 
 ##1969843
-url = 'https://www.panda.tv/1512212'
+url = 'https://www.panda.tv/10300'
 dmc = DanMuClient(url)
 if not dmc.isValid(): print('Url not valid')
 
