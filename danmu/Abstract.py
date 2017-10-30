@@ -70,7 +70,8 @@ class AbstractDanMuClient(object):
         def get_danmu(self):
             while self.live and not self.deprecated:
                 if self.danmuWaitTime != -1 and self.danmuWaitTime < time.time():
-                    raise Exception('No danmu received in %ss'%self.maxNoDanMuWait)
+                    self._init_socket(self._prepare_env())
+                    debug.warning('No danmu received in %ss'%self.maxNoDanMuWait)
                 danmuThreadFn(self)
         self.heartThread = threading.Thread(target = heart_beat, args = (self,))
         self.heartThread.setDaemon(True)
