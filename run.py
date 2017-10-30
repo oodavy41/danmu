@@ -45,12 +45,10 @@ def onCloseFun():
     global JSONFILE
     JSONFILE['file'].write('</i>\n')
     JSONFILE['file'].close()
-    pathF = 'mvs/%s/%s' % (JSONFILE['name'], JSONFILE['name'])
-    path = 'mvs/%s' % JSONFILE['name']
-    #subprocess.call(["python3","niconvert.pyw","mvs/2017-10-21/2017-10-21.xml","-o","mvs/2017-10-21/"],True)
-    subprocess.call([
-        "python3", "niconvert.pyw", pathF + ".xml", "-o" , path
-    ], True)
+    pathF = 'mvs/%s/%s.xml' % (JSONFILE['name'], JSONFILE['name'])
+    path = 'mvs/%s/' % JSONFILE['name']
+    subprocess.call(
+        ["python", "niconvert.pyw", pathF, "+r", "1600x900", "-o", path])
     JSONFILE = {'name': '', 'time': 0.0, 'file': None}
 
 
