@@ -11,7 +11,7 @@ def pp(msg):
 
 
 ##1969843
-url = 'https://www.panda.tv/10300'
+url = 'https://www.panda.tv/24163'
 dmc = DanMuClient(url)
 if not dmc.isValid(): print('Url not valid')
 
@@ -84,6 +84,8 @@ def state_change(msg):
 @dmc.danmu
 def danmu_fn(msg):
     global JSONFILE
+    if(msg['Content'].find('[:')!=-1):
+        return
     print(pp('%s:[%s] %s' % (time.time(), msg['NickName'], msg['Content'])))
     if (JSONFILE['file'] != None and not JSONFILE['file'].closed):
         JSONFILE['file'].write(u'<d p="%s,1,25,16777215,0,0,0,0">%s</d>\n' %
