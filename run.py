@@ -57,7 +57,7 @@ def onCloseFun():
     pathF = 'mvs/%s/%s.xml' % (JSONFILE['name'], JSONFILE['name'])
     path = 'mvs/%s/' % JSONFILE['name']
     subprocess.call(
-        ["python", "niconvert.pyw", pathF, "+r", "1600x900", "-o", path])
+        ["python3", "niconvert.pyw", pathF, "+r", "1600x900", "-o", path])
     JSONFILE['stream'].terminate()
     subprocess.call([
         'ffmpeg', '-threads', 'auto', '-i',
