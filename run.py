@@ -61,7 +61,7 @@ def onCloseFun():
     subprocess.call(
         ["python3", "niconvert.pyw", pathF, "+r", "1600x900", "-o", path])
     JSONFILE['stream'].terminate()
-    subprocess.call([
+    subprocess.Popen([
         'ffmpeg', '-threads', 'auto', '-i',
         'mvs/%s/%s.flv' % (JSONFILE['name'], JSONFILE['name']), '-vcodec',
         'libx264', '-strict', '-2', '-crf', '23.5', '-vf',
