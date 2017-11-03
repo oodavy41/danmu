@@ -11,7 +11,7 @@ def pp(msg):
 
 
 ##1969843
-url = 'https://www.panda.tv/24163'
+url = 'https://www.panda.tv/10300'
 dmc = DanMuClient(url)
 if not dmc.isValid(): print('Url not valid')
 
@@ -26,6 +26,7 @@ XMLhead = u'''
 '''
 
 JSONFILE = {'name': '', 'time': 0.0, 'file': None, 'stream': None}
+DOZENFLAG = 0
 
 #danmu{time:unixtime,message:text}
 #ffmpeg -i Lantern.mp4 -vcodec libx264 -preset fast -crf 20 -vf "ass=Lantern.ass" out.mp4
@@ -35,7 +36,7 @@ JSONFILE = {'name': '', 'time': 0.0, 'file': None, 'stream': None}
 def onOpenFun():
     global JSONFILE
     global url
-    JSONFILE['name'] = datetime.datetime.now().strftime('%Y-%m-%d')
+    JSONFILE['name'] = datetime.datetime.now().strftime('%Y-%m-%d') + ' (%d)'%DOZENFLAG
     JSONFILE['time'] = time.time()
     if not os.path.exists('mvs/' + JSONFILE['name']):
         os.makedirs('mvs/' + JSONFILE['name'])
@@ -51,7 +52,8 @@ def onOpenFun():
 
 
 def onCloseFun():
-    global JSONFILE
+    global JSONFILE,DOZENFLAG
+    DOZENFLAG+=1
     JSONFILE['file'].write('</i>\n')
     JSONFILE['file'].close()
     pathF = 'mvs/%s/%s.xml' % (JSONFILE['name'], JSONFILE['name'])
@@ -72,13 +74,14 @@ def onCloseFun():
 @dmc.onState
 def state_change(msg):
     print(pp("Live State Change: " + str(msg['value'])))
-    global JSONFILE
+    global JSONFILE,DOZENFLAG
     if (msg['value']):
         if (JSONFILE['file'] != None):
             onCloseFun()
         onOpenFun()
     else:
         onCloseFun()
+    DOZENFLAG=0
 
 
 @dmc.danmu
@@ -92,6 +95,11 @@ def danmu_fn(msg):
                                (time.time() - JSONFILE['time'],
                                 pp(msg['Content'])))
         JSONFILE['file'].flush()
+        if(time.time() - JSONFILE['time']>3600):
+            onCloseFun()
+            onOpenFun()
+            print('one hour cut')
+
 
 
 @dmc.gift
