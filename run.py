@@ -36,38 +36,38 @@ DOZENFLAG = 0
 def onOpenFun():
     global JSONFILE
     global url
-    JSONFILE['name'] = datetime.datetime.now().strftime('%Y-%m-%d') + ' (%d)'%DOZENFLAG
+    JSONFILE['name'] = datetime.datetime.now().strftime('%Y-%m-%d')
     JSONFILE['time'] = time.time()
     if not os.path.exists('mvs/' + JSONFILE['name']):
         os.makedirs('mvs/' + JSONFILE['name'])
     JSONFILE['file'] = open('mvs/%s/%s.xml' % (JSONFILE['name'],
-                                               JSONFILE['name']), 'w', -1,
+                                               JSONFILE['name'] + ' (%d)'%DOZENFLAG), 'w', -1,
                             "utf8")
     JSONFILE['file'].write(XMLhead % JSONFILE['time'])
 
     JSONFILE['stream'] = subprocess.Popen([
         'you-get', '-o',
-        'mvs/%s' % JSONFILE['name'], '-O', JSONFILE['name'], url
+        'mvs/%s' % JSONFILE['name'], '-O', JSONFILE['name'] + ' (%d)'%DOZENFLAG, url
     ])
 
 
 def onCloseFun():
     global JSONFILE,DOZENFLAG
-    DOZENFLAG+=1
     JSONFILE['file'].write('</i>\n')
     JSONFILE['file'].close()
-    pathF = 'mvs/%s/%s.xml' % (JSONFILE['name'], JSONFILE['name'])
+    pathF = 'mvs/%s/%s' % (JSONFILE['name'], JSONFILE['name'] + ' (%d)'%DOZENFLAG)
     path = 'mvs/%s/' % JSONFILE['name']
     subprocess.call(
-        ["python3", "niconvert.pyw", pathF, "+r", "1600x900", "-o", path])
+        ["python3", "niconvert.pyw", '%s.xml'%pathF, "+r", "1600x900", "-o", path])
     JSONFILE['stream'].terminate()
     subprocess.Popen([
         'ffmpeg', '-threads', 'auto', '-i',
-        'mvs/%s/%s.flv' % (JSONFILE['name'], JSONFILE['name']), '-vcodec',
+        '%s.flv' % pathF, '-vcodec',
         'libx264', '-strict', '-2', '-crf', '23.5', '-vf',
-        'ass=mvs/%s/%s.ass' % (JSONFILE['name'], JSONFILE['name']),
-        'mvs/%s/%s.mp4' % (JSONFILE['name'], JSONFILE['name'])
+        'ass=%s.ass' % pathF,
+        '%s.mp4' % pathF
     ])
+    DOZENFLAG+=1
     JSONFILE = {'name': '', 'time': 0.0, 'file': None, 'stream': None}
 
 
