@@ -1,19 +1,25 @@
 #!/usr/bin/python3
 # -*- coding:utf8 -*-
 
-import time, sys, datetime, os, subprocess, signal
+import time
+import sys
+import datetime
+import os
+import subprocess
+import signal
 
 from danmu import DanMuClient
 
 
 def pp(msg):
-    return msg  #(msg.decode('utf8').encode('gbk'))
+    return msg  # (msg.decode('utf8').encode('gbk'))
 
 
-##1969843
+# 1969843
 url = 'https://www.panda.tv/10300'
 dmc = DanMuClient(url)
-if not dmc.isValid(): print('Url not valid')
+if not dmc.isValid():
+    print('Url not valid')
 
 XMLhead = u'''
 <i>%s
@@ -28,37 +34,39 @@ XMLhead = u'''
 JSONFILE = {'name': '', 'time': 0.0, 'file': None, 'stream': None}
 DOZENFLAG = 0
 
-#danmu{time:unixtime,message:text}
-#ffmpeg -i Lantern.mp4 -vcodec libx264 -preset fast -crf 20 -vf "ass=Lantern.ass" out.mp4
-#ffmpeg -i 2017-10-26.flv -vcodec libx264 -crf 23.5 -strict -2 2017-10-26.mp4
+# danmu{time:unixtime,message:text}
+# ffmpeg -i Lantern.mp4 -vcodec libx264 -preset fast -crf 20 -vf "ass=Lantern.ass" out.mp4
+# ffmpeg -i 2017-10-26.flv -vcodec libx264 -crf 23.5 -strict -2 2017-10-26.mp4
 
 
 def onOpenFun():
-    global JSONFILE
-    global url
-    JSONFILE['name'] = datetime.datetime.now().strftime('%Y-%m-%d')
+    global JSONFILE, url, DOZENFLAG
+    if(DOZENFLAG == 0):
+        JSONFILE['name'] = datetime.datetime.now().strftime('%Y-%m-%d')
     JSONFILE['time'] = time.time()
     if not os.path.exists('mvs/' + JSONFILE['name']):
         os.makedirs('mvs/' + JSONFILE['name'])
     JSONFILE['file'] = open('mvs/%s/%s.xml' % (JSONFILE['name'],
-                                               JSONFILE['name'] + ' (%d)'%DOZENFLAG), 'w', -1,
+                                               JSONFILE['name'] + '|%d|' % DOZENFLAG), 'w', -1,
                             "utf8")
     JSONFILE['file'].write(XMLhead % JSONFILE['time'])
 
     JSONFILE['stream'] = subprocess.Popen([
         'you-get', '-o',
-        'mvs/%s' % JSONFILE['name'], '-O', JSONFILE['name'] + ' (%d)'%DOZENFLAG, url
+        'mvs/%s' % JSONFILE['name'], '-O', JSONFILE['name'] +
+        '|%d|' % DOZENFLAG, url
     ])
 
 
 def onCloseFun():
-    global JSONFILE,DOZENFLAG
+    global JSONFILE, DOZENFLAG
     JSONFILE['file'].write('</i>\n')
     JSONFILE['file'].close()
-    pathF = 'mvs/%s/%s' % (JSONFILE['name'], JSONFILE['name'] + ' (%d)'%DOZENFLAG)
+    pathF = 'mvs/%s/%s' % (JSONFILE['name'],
+                           JSONFILE['name'] + '|%d|' % DOZENFLAG)
     path = 'mvs/%s/' % JSONFILE['name']
     subprocess.call(
-        ["python3", "niconvert.pyw", '%s.xml'%pathF, "+r", "1600x900", "-o", path])
+        ["python3", "niconvert.pyw", '%s.xml' % pathF, "+r", "1600x900", "-o", path])
     JSONFILE['stream'].terminate()
     subprocess.Popen([
         'ffmpeg', '-threads', 'auto', '-i',
@@ -67,39 +75,38 @@ def onCloseFun():
         'ass=%s.ass' % pathF,
         '%s.mp4' % pathF
     ])
-    DOZENFLAG+=1
+    DOZENFLAG += 1
     JSONFILE = {'name': '', 'time': 0.0, 'file': None, 'stream': None}
 
 
 @dmc.onState
 def state_change(msg):
     print(pp("Live State Change: " + str(msg['value'])))
-    global JSONFILE,DOZENFLAG
+    global JSONFILE, DOZENFLAG
     if (msg['value']):
-        if (JSONFILE['file'] != None):
+        if (JSONFILE['file'] is not None):
             onCloseFun()
         onOpenFun()
     else:
         onCloseFun()
-    DOZENFLAG=0
+    DOZENFLAG = 0
 
 
 @dmc.danmu
 def danmu_fn(msg):
     global JSONFILE
-    if(msg['Content'].find('[:')!=-1):
+    if(msg['Content'].find('[:') != -1):
         return
     print(pp('%s:[%s] %s' % (time.time(), msg['NickName'], msg['Content'])))
-    if (JSONFILE['file'] != None and not JSONFILE['file'].closed):
+    if (JSONFILE['file'] is not None and not JSONFILE['file'].closed):
         JSONFILE['file'].write(u'<d p="%s,1,25,16777215,0,0,0,0">%s</d>\n' %
                                (time.time() - JSONFILE['time'],
                                 pp(msg['Content'])))
         JSONFILE['file'].flush()
-        if(time.time() - JSONFILE['time']>3600):
+        if(time.time() - JSONFILE['time'] > 3600):
             onCloseFun()
             onOpenFun()
             print('one hour cut')
-
 
 
 @dmc.gift
@@ -114,7 +121,7 @@ def other_fn(msg):
 
 def lda(*args):
     global JSONFILE
-    if (JSONFILE['file'] != None and not JSONFILE['file'].closed):
+    if (JSONFILE['file'] is not None and not JSONFILE['file'].closed):
         onCloseFun()
     exit()
 
