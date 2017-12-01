@@ -47,7 +47,7 @@ def onOpenFun():
     if not os.path.exists('mvs/' + JSONFILE['name']):
         os.makedirs('mvs/' + JSONFILE['name'])
     JSONFILE['file'] = open('mvs/%s/%s.xml' % (JSONFILE['name'],
-                                               JSONFILE['name'] + '|%d|' % DOZENFLAG), 'w', -1,
+                                               JSONFILE['name'] + '|%d|' % (DOZENFLAG + 1)), 'w', -1,
                             "utf8")
     JSONFILE['file'].write(XMLhead % JSONFILE['time'])
 
@@ -76,7 +76,7 @@ def onCloseFun():
         '%s.mp4' % pathF
     ])
     DOZENFLAG += 1
-    JSONFILE = {'name': '', 'time': 0.0, 'file': None, 'stream': None}
+    JSONFILE = {'name': JSONFILE['name'], 'time': 0.0, 'file': None, 'stream': None}
 
 
 @dmc.onState
