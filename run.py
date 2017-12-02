@@ -47,7 +47,7 @@ def onOpenFun():
     if not os.path.exists('mvs/' + JSONFILE['name']):
         os.makedirs('mvs/' + JSONFILE['name'])
     JSONFILE['file'] = open('mvs/%s/%s.xml' % (JSONFILE['name'],
-                                               JSONFILE['name'] + '|%d|' % (DOZENFLAG + 1)), 'w', -1,
+                                               JSONFILE['name'] + '|%d|' % DOZENFLAG), 'w', -1,
                             "utf8")
     JSONFILE['file'].write(XMLhead % JSONFILE['time'])
 
@@ -64,16 +64,18 @@ def onCloseFun():
     JSONFILE['file'].close()
     pathF = 'mvs/%s/%s' % (JSONFILE['name'],
                            JSONFILE['name'] + '|%d|' % DOZENFLAG)
+    pathOut = 'mvs/%s/%s' % (JSONFILE['name'],
+                           JSONFILE['name'] + ' P%d' % (DOZENFLAG+1))
     path = 'mvs/%s/' % JSONFILE['name']
     subprocess.call(
-        ["python3", "niconvert.pyw", '%s.xml' % pathF, "+r", "1600x900", "-o", path])
+        ["python3", "niconvert.pyw", '%s.xml' % pathF, "+r", "1280x720", "-o", path])
     JSONFILE['stream'].terminate()
     subprocess.Popen([
         'ffmpeg', '-threads', 'auto', '-i',
         '%s.flv' % pathF, '-vcodec',
         'libx264', '-strict', '-2', '-crf', '23.5', '-vf',
         'ass=%s.ass' % pathF,
-        '%s.mp4' % pathF
+        '%s.mp4' % pathOut
     ])
     DOZENFLAG += 1
     JSONFILE = {'name': JSONFILE['name'], 'time': 0.0, 'file': None, 'stream': None}
